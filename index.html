@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>植物有哪些妙招？</title>
+  <style>
+    :root {
+      --green-dark: #2d6a4f;
+      --green-mid: #40916c;
+      --green-light: #74c69d;
+      --green-pale: #d8f3dc;
+      --yellow: #f9c74f;
+      --orange: #f3722c;
+      --red: #e63946;
+      --blue: #457b9d;
+      --purple: #7b2d8b;
+      --bg: #f0faf3;
+      --card-bg: #ffffff;
+      --text: #1b4332;
+      --shadow: 0 4px 20px rgba(45,106,79,0.13);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, #1b4332 0%, #40916c 60%, #74c69d 100%);
+      color: #fff;
+      text-align: center;
+      padding: 56px 24px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '🌿🌺🌵🍀🌸🌾🌻🌿';
+      position: absolute;
+      top: 10px; left: 0; right: 0;
+      font-size: 2rem;
+      opacity: 0.18;
+      letter-spacing: 8px;
+      white-space: nowrap;
+    }
+    .hero h1 { font-size: clamp(2rem,5vw,3.2rem); font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; }
+    .hero p  { font-size: 1.15rem; opacity: 0.9; max-width: 620px; margin: 0 auto; }
+
+    /* ── NAV TABS ── */
+    .tabs {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+      padding: 20px 16px 0;
+      background: var(--green-dark);
+    }
+    .tab-btn {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: none; border-radius: 24px;
+      padding: 8px 20px; font-size: 0.95rem; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .tab-btn:hover   { background: rgba(255,255,255,0.3); }
+    .tab-btn.active  { background: var(--yellow); color: var(--green-dark); font-weight: 700; transform: translateY(-2px); }
+
+    /* ── MAIN ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 32px 16px 60px; }
+
+    /* ── SECTION ── */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .section-title {
+      font-size: 1.6rem; font-weight: 800;
+      color: var(--green-dark);
+      margin-bottom: 24px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid var(--green-light);
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    /* ── CARD GRID ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border-top: 5px solid var(--green-light);
+      position: relative;
+    }
+    .card:hover { transform: translateY(-6px); box-shadow: 0 10px 32px rgba(45,106,79,0.2); }
+    .card .emoji { font-size: 2.4rem; margin-bottom: 10px; }
+    .card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; color: var(--green-dark); }
+    .card p  { font-size: 0.9rem; line-height: 1.6; color: #4a6741; }
+    .card .tag {
+      display: inline-block; margin-top: 12px;
+      background: var(--green-pale); color: var(--green-dark);
+      border-radius: 12px; padding: 3px 12px; font-size: 0.78rem; font-weight: 600;
+    }
+
+    /* colour variants */
+    .card.orange { border-top-color: var(--orange); }
+    .card.yellow { border-top-color: var(--yellow); }
+    .card.red    { border-top-color: var(--red); }
+    .card.blue   { border-top-color: var(--blue); }
+    .card.purple { border-top-color: var(--purple); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center; align-items: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 20px;
+      max-width: 600px; width: 100%;
+      max-height: 85vh; overflow-y: auto;
+      padding: 36px 32px;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .modal-close {
+      position: absolute; top: 14px; right: 18px;
+      background: var(--green-pale); border: none; border-radius: 50%;
+      width: 34px; height: 34px; font-size: 1.1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: var(--green-light); }
+    .modal h2 { font-size: 1.5rem; color: var(--green-dark); margin-bottom: 6px; }
+    .modal .modal-subtitle { color: #6b8f71; margin-bottom: 16px; font-size: 0.95rem; }
+    .modal .modal-body p  { line-height: 1.8; margin-bottom: 12px; }
+    .modal .modal-body ul { padding-left: 20px; margin-bottom: 12px; }
+    .modal .modal-body li { margin-bottom: 6px; line-height: 1.7; }
+    .modal .highlight-box {
+      background: var(--green-pale); border-radius: 10px;
+      padding: 14px 18px; margin: 14px 0;
+      border-left: 4px solid var(--green-mid);
+      font-size: 0.92rem; line-height: 1.7;
+    }
+
+    /* ── OVERVIEW STATS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px; margin-bottom: 32px;
+    }
+    .stat-box {
+      background: var(--card-bg);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .stat-box .num { font-size: 2.4rem; font-weight: 900; color: var(--green-mid); }
+    .stat-box .lbl { font-size: 0.82rem; color: #5a7a5e; margin-top: 4px; }
+
+    /* ── QUIZ ── */
+    .quiz-wrap { max-width: 680px; margin: 0 auto; }
+    .quiz-question {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 28px 28px 20px;
+      margin-bottom: 16px;
+    }
+    .quiz-question .q-num {
+      font-size: 0.8rem; font-weight: 700;
+      color: var(--green-mid); margin-bottom: 6px;
+    }
+    .quiz-question .q-text { font-size: 1.05rem; font-weight: 600; margin-bottom: 16px; }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-opt {
+      background: var(--green-pale);
+      border: 2px solid transparent;
+      border-radius: 10px; padding: 10px 16px;
+      cursor: pointer; font-size: 0.95rem;
+      transition: border-color 0.15s, background 0.15s;
+      text-align: left;
+    }
+    .quiz-opt:hover:not(.disabled) { border-color: var(--green-mid); background: #c4edcf; }
+    .quiz-opt.correct  { background: #b7e4c7; border-color: var(--green-mid); font-weight: 700; }
+    .quiz-opt.wrong    { background: #f8d7da; border-color: var(--red); }
+    .quiz-opt.disabled { cursor: default; }
+    .quiz-explain {
+      display: none; margin-top: 10px;
+      background: #fff8e1; border-radius: 8px;
+      padding: 10px 14px; font-size: 0.88rem; line-height: 1.6;
+      border-left: 4px solid var(--yellow);
+    }
+    .quiz-explain.show { display: block; }
+    .quiz-score {
+      text-align: center; padding: 20px;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--green-dark);
+    }
+    .btn-primary {
+      display: block; width: fit-content; margin: 16px auto 0;
+      background: var(--green-mid); color: #fff;
+      border: none; border-radius: 24px;
+      padding: 10px 28px; font-size: 1rem; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--green-dark); }
+
+    /* ── TIMELINE ── */
+    .timeline { position: relative; padding-left: 32px; }
+    .timeline::before {
+      content: '';
+      position: absolute; left: 12px; top: 0; bottom: 0;
+      width: 3px; background: var(--green-light);
+    }
+    .tl-item {
+      position: relative; margin-bottom: 28px;
+    }
+    .tl-item::before {
+      content: '';
+      position: absolute; left: -26px; top: 5px;
+      width: 14px; height: 14px;
+      border-radius: 50%; background: var(--green-mid);
+      border: 3px solid #fff; box-shadow: 0 0 0 2px var(--green-light);
+    }
+    .tl-item h4 { font-size: 1rem; font-weight: 700; color: var(--green-dark); margin-bottom: 4px; }
+    .tl-item p  { font-size: 0.88rem; line-height: 1.6; color: #4a6741; }
+
+    @media (max-width: 500px) {
+      .modal { padding: 24px 18px; }
+      .hero h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <h1>🌱 植物有哪些妙招？</h1>
+  <p>探索植物為了生存、繁殖、防禦所演化出的神奇策略與本領</p>
+</header>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="tab-btn active" onclick="showTab('overview')">🏠 總覽</button>
+  <button class="tab-btn" onclick="showTab('survival')">💧 生存妙招</button>
+  <button class="tab-btn" onclick="showTab('reproduce')">🌸 繁殖策略</button>
+  <button class="tab-btn" onclick="showTab('defense')">🛡️ 防禦機制</button>
+  <button class="tab-btn" onclick="showTab('interact')">🤝 共生互利</button>
+  <button class="tab-btn" onclick="showTab('quiz')">📝 小測驗</button>
+</nav>
+
+<main>
+
+  <!-- ══ 總覽 ══ -->
+  <section id="overview" class="section active">
+    <h2 class="section-title">🌍 植物妙招總覽</h2>
+    <div class="stats-row">
+      <div class="stat-box"><div class="num">39萬+</div><div class="lbl">已知植物種類</div></div>
+      <div class="stat-box"><div class="num">4億</div><div class="lbl">年演化史（年）</div></div>
+      <div class="stat-box"><div class="num">5大</div><div class="lbl">妙招類別</div></div>
+      <div class="stat-box"><div class="num">70%</div><div class="lbl">陸地植物覆蓋率</div></div>
+    </div>
+
+    <div class="card-grid">
+      <div class="card" onclick="openModal('m-photo')">
+        <div class="emoji">☀️</div>
+        <h3>光合作用——能量工廠</h3>
+        <p>植物利用葉綠素捕捉陽光，將二氧化碳與水轉化成糖分，同時釋放氧氣，是地球生命的基礎。</p>
+        <span class="tag">生存</span>
+      </div>
+      <div class="card yellow" onclick="openModal('m-pollinate')">
+        <div class="emoji">🐝</div>
+        <h3>招蜂引蝶——授粉妙招</h3>
+        <p>花朵用色彩、氣味、蜜液吸引昆蟲、鳥類或蝙蝠來幫助傳粉，確保繁殖成功。</p>
+        <span class="tag">繁殖</span>
+      </div>
+      <div class="card orange" onclick="openModal('m-seed')">
+        <div class="emoji">🌬️</div>
+        <h3>種子旅行——散播策略</h3>
+        <p>蒲公英靠風飛翔、鉤刺黏附動物毛皮、漿果被鳥吃下後遠播，植物各出奇招讓後代遷徙。</p>
+        <span class="tag">繁殖</span>
+      </div>
+      <div class="card red" onclick="openModal('m-thorn')">
+        <div class="emoji">🌵</div>
+        <h3>刺、毒、臭——防禦大師</h3>
+        <p>荊棘阻擋草食動物、毒素讓昆蟲退散、揮發性化學物質召喚天敵，植物的防禦令人歎為觀止。</p>
+        <span class="tag">防禦</span>
+      </div>
+      <div class="card blue" onclick="openModal('m-drought')">
+        <div class="emoji">💧</div>
+        <h3>儲水抗旱——沙漠生存術</h3>
+        <p>仙人掌將葉變成刺減少蒸散、莖膨大儲水；景天酸代謝讓植物在夜晚才開氣孔節水。</p>
+        <span class="tag">生存</span>
+      </div>
+      <div class="card purple" onclick="openModal('m-symbiosis')">
+        <div class="emoji">🍄</div>
+        <h3>共生互利——根與菌的結盟</h3>
+        <p>90%以上植物與菌根菌共生，真菌幫助吸水礦物質，植物回報光合糖分，地下網絡交換訊息。</p>
+        <span class="tag">共生</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 生存妙招 ══ -->
+  <section id="survival" class="section">
+    <h2 class="section-title">💧 生存妙招</h2>
+    <div class="card-grid">
+      <div class="card" onclick="openModal('m-photo')">
+        <div class="emoji">☀️</div>
+        <h3>光合作用</h3>
+        <p>葉綠體中的葉綠素吸收光能，驅動暗反應將 CO₂ 固定為有機物——這是植物最根本的能量來源。</p>
+        <span class="tag">能量獲取</span>
+      </div>
+      <div class="card blue" onclick="openModal('m-drought')">
+        <div class="emoji">🌵</div>
+        <h3>CAM 景天酸代謝</h3>
+        <p>夜晚開氣孔固定 CO₂ 儲存為蘋果酸，白天關閉氣孔在細胞內釋出進行光合，節省水分高達 90%。</p>
+        <span class="tag">抗旱</span>
+      </div>
+      <div class="card yellow" onclick="openModal('m-carnivore')">
+        <div class="emoji">🪲</div>
+        <h3>食蟲植物補氮</h3>
+        <p>豬籠草、捕蠅草生長在氮缺乏的土壤，演化出黏液、陷阱、電感應夾，捕食昆蟲補充養分。</p>
+        <span class="tag">特殊營養</span>
+      </div>
+      <div class="card orange" onclick="openModal('m-shade')">
+        <div class="emoji">🌿</div>
+        <h3>趨光與避蔭反應</h3>
+        <p>植物偵測紅光與遠紅光比例判斷競爭狀態，遮蔭時加速莖的伸長快速「爬出陰影」爭奪陽光。</p>
+        <span class="tag">光競爭</span>
+      </div>
+      <div class="card red" onclick="openModal('m-freeze')">
+        <div class="emoji">❄️</div>
+        <h3>耐凍策略</h3>
+        <p>細胞累積溶質降低冰點、合成抗凍蛋白阻止冰晶生長、落葉回收養分進入休眠——多管齊下度過寒冬。</p>
+        <span class="tag">抗逆境</span>
+      </div>
+      <div class="card purple" onclick="openModal('m-haustoria')">
+        <div class="emoji">🌾</div>
+        <h3>寄生植物吸器</h3>
+        <p>菟絲子和列當沒有葉綠素，靠特化的吸器刺入宿主維管束，直接竊取水分與有機物維生。</p>
+        <span class="tag">寄生</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 繁殖策略 ══ -->
+  <section id="reproduce" class="section">
+    <h2 class="section-title">🌸 繁殖策略</h2>
+    <div class="card-grid">
+      <div class="card" onclick="openModal('m-pollinate')">
+        <div class="emoji">🐝</div>
+        <h3>蟲媒授粉</h3>
+        <p>花朵產生特定氣味模仿雌蟲費洛蒙騙雄蟲；或提供蜜液做為報酬，吸引蜂、蝶、蛾傳粉。</p>
+        <span class="tag">有性生殖</span>
+      </div>
+      <div class="card blue" onclick="openModal('m-wind-pollen')">
+        <div class="emoji">🌬️</div>
+        <h3>風媒授粉</h3>
+        <p>松、杉、禾本科花粉量龐大、質地輕，花序懸掛迎風，雌蕊具毛狀羽毛接住飄散花粉。</p>
+        <span class="tag">有性生殖</span>
+      </div>
+      <div class="card orange" onclick="openModal('m-seed')">
+        <div class="emoji">🌬️</div>
+        <h3>風力散播種子</h3>
+        <p>蒲公英冠毛、楓樹翅果、木棉棉絮，各種飛行裝置讓種子搭乘氣流，落地生根於新領地。</p>
+        <span class="tag">種子散播</span>
+      </div>
+      <div class="card yellow" onclick="openModal('m-fruit-animal')">
+        <div class="emoji">🍓</div>
+        <h3>動物食果散播</h3>
+        <p>果實以鮮豔顏色與甜美果肉引誘動物取食，種子外殼耐胃酸，隨糞便遠散，達到異地繁殖。</p>
+        <span class="tag">種子散播</span>
+      </div>
+      <div class="card red" onclick="openModal('m-clone')">
+        <div class="emoji">🌱</div>
+        <h3>無性繁殖</h3>
+        <p>走莖（草莓）、地下莖（薑）、匍匐莖（薄荷）、塊莖（馬鈴薯）——在同一地點快速擴張領地。</p>
+        <span class="tag">無性生殖</span>
+      </div>
+      <div class="card purple" onclick="openModal('m-explosive')">
+        <div class="emoji">💥</div>
+        <h3>彈射散播</h3>
+        <p>鳳仙花蒴果乾燥後張力驟增，一觸即爆、將種子彈出數公尺；噴瓜更能噴射種子達十公尺遠。</p>
+        <span class="tag">種子散播</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 防禦機制 ══ -->
+  <section id="defense" class="section">
+    <h2 class="section-title">🛡️ 防禦機制</h2>
+    <div class="card-grid">
+      <div class="card" onclick="openModal('m-thorn')">
+        <div class="emoji">🌹</div>
+        <h3>物理防禦：刺與毛</h3>
+        <p>刺阻擋草食動物、表皮蠟質減少水分散失並阻蟲攀爬、腺毛分泌黏液捕捉小昆蟲。</p>
+        <span class="tag">結構防禦</span>
+      </div>
+      <div class="card red" onclick="openModal('m-toxin')">
+        <div class="emoji">☠️</div>
+        <h3>化學防禦：毒素生物鹼</h3>
+        <p>咖啡因、嗎啡、菸鹼素等生物鹼是對草食者的警告；單寧酸降低蛋白質消化率讓昆蟲停止取食。</p>
+        <span class="tag">化學防禦</span>
+      </div>
+      <div class="card orange" onclick="openModal('m-volatile')">
+        <div class="emoji">📡</div>
+        <h3>揮發性化學訊號</h3>
+        <p>植物受傷後釋放茉莉酮酸等訊號分子，鄰近植株接收後提前合成防禦物質，群體共同禦敵。</p>
+        <span class="tag">化學訊號</span>
+      </div>
+      <div class="card yellow" onclick="openModal('m-mimic')">
+        <div class="emoji">🦋</div>
+        <h3>偽裝與擬態</h3>
+        <p>某些植物葉片演化出蟲卵狀斑點，讓蝴蝶誤以為已有競爭者而不產卵；石頭玉偽裝成礫石躲避草食動物。</p>
+        <span class="tag">視覺防禦</span>
+      </div>
+      <div class="card blue" onclick="openModal('m-ant')">
+        <div class="emoji">🐜</div>
+        <h3>僱用螞蟻當保鑣</h3>
+        <p>牛角金合歡為螞蟻提供食物（蜜腺）與住所（空心刺），螞蟻則攻擊所有靠近的草食動物與纏繞植物。</p>
+        <span class="tag">生物防禦</span>
+      </div>
+      <div class="card purple" onclick="openModal('m-hypersensitive')">
+        <div class="emoji">⚡</div>
+        <h3>過敏反應（HR）</h3>
+        <p>病原菌入侵後，植物迅速讓感染細胞凋亡，形成壞死壁壘阻止病菌擴散，並誘導全身性抵抗反應 SAR。</p>
+        <span class="tag">免疫</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 共生互利 ══ -->
+  <section id="interact" class="section">
+    <h2 class="section-title">🤝 共生互利</h2>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <h4>🍄 菌根菌共生（Mycorrhiza）</h4>
+        <p>約 90% 的陸生植物與真菌的菌絲形成菌根，菌絲大幅擴展根的吸水面積，植物供給光合糖分作為回報。菌根網甚至連接不同植株之間傳遞碳源與訊號（木聯網）。</p>
+      </div>
+      <div class="tl-item">
+        <h4>🦠 根瘤菌固氮（Rhizobium）</h4>
+        <p>豆科植物根部與根瘤菌共生，細菌將大氣氮氣（N₂）固定為氨（NH₄⁺），植物獲得氮源、細菌獲得光合產物；固氮量每年可達 50–200 kg/ha。</p>
+      </div>
+      <div class="tl-item">
+        <h4>🐝 互利授粉（Mutualistic Pollination）</h4>
+        <p>榕樹與榕小蜂專一共演化——每種榕樹只有一種授粉榕小蜂，雌蜂在果實內產卵、同時傳粉，雙方高度相互依存。</p>
+      </div>
+      <div class="tl-item">
+        <h4>🐜 蟻植共生（Myrmecophytism）</h4>
+        <p>熱帶蟻栖植物（Myrmecodia）莖部形成空腔供螞蟻築巢，螞蟻廢棄物提供養分，並驅逐競爭者與草食動物。</p>
+      </div>
+      <div class="tl-item">
+        <h4>🦅 種子散播者（Seed Dispersers）</h4>
+        <p>果實提供營養回報、種子的硬殼耐受消化道，動物成為免費的「種子快遞員」，植物基因得以擴散至廣大領域。</p>
+      </div>
+      <div class="tl-item">
+        <h4>🌊 地下化學溝通</h4>
+        <p>植物根部分泌化感物質（Allelochemicals），既能抑制競爭鄰居的發芽，也能透過菌根網路傳遞昆蟲攻擊訊號，讓遠處同伴提前備戰。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 小測驗 ══ -->
+  <section id="quiz" class="section">
+    <h2 class="section-title">📝 植物妙招小測驗</h2>
+    <div class="quiz-wrap" id="quiz-container"></div>
+    <div class="quiz-score" id="quiz-score" style="display:none"></div>
+    <button class="btn-primary" id="quiz-restart" style="display:none" onclick="initQuiz()">🔄 再玩一次</button>
+  </section>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2 id="modal-title"></h2>
+    <div class="modal-subtitle" id="modal-subtitle"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ── TAB NAVIGATION ──
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'quiz') initQuiz();
+}
+
+// ── MODAL DATA ──
+const modals = {
+  'm-photo': {
+    title: '☀️ 光合作用——植物的能量工廠',
+    sub: '生存妙招 | 所有植物',
+    body: `
+      <p>光合作用是植物生存的核心策略，分為兩個階段：</p>
+      <ul>
+        <li><strong>光反應</strong>：在葉綠體類囊體膜上，葉綠素吸收光能，分解水分子（H₂O）並釋放氧氣（O₂），同時產生 ATP 和 NADPH。</li>
+        <li><strong>暗反應（卡爾文循環）</strong>：在葉綠體基質中，利用 ATP 和 NADPH 將 CO₂ 固定為葡萄糖。</li>
+      </ul>
+      <div class="highlight-box">
+        📌 <strong>總方程式</strong>：6CO₂ + 6H₂O + 光能 → C₆H₁₂O₆ + 6O₂
+      </div>
+      <p>植物演化出 C3、C4 及 CAM 三種光合途徑，分別適應不同溫度與水分條件，展現出驚人的適應彈性。</p>
+    `
+  },
+  'm-pollinate': {
+    title: '🐝 招蜂引蝶——授粉妙招',
+    sub: '繁殖策略 | 蟲媒花植物',
+    body: `
+      <p>花朵是植物繁殖的廣告看板，演化出多種精妙招數：</p>
+      <ul>
+        <li><strong>視覺誘惑</strong>：鮮豔花瓣、紫外線花紋（蜜蜂可見）引導授粉者找到蜜腺。</li>
+        <li><strong>氣味詐騙</strong>：蘭花模仿雌性昆蟲的費洛蒙，雄蟲嘗試「交配」時順帶沾取花粉。</li>
+        <li><strong>蜜液報酬</strong>：真實提供花蜜糖分，建立長期互利關係。</li>
+        <li><strong>形態鎖鑰</strong>：花朵形狀與授粉者吻、喙精確匹配，確保花粉交給正確的物種。</li>
+      </ul>
+      <div class="highlight-box">
+        🌺 馬達加斯加的大彗星蘭有長達 30 公分的花距，達爾文預測必有一種長舌蛾替它授粉——果然在 40 年後被發現！
+      </div>
+    `
+  },
+  'm-seed': {
+    title: '🌬️ 種子旅行——風力散播',
+    sub: '繁殖策略 | 蒲公英、楓樹、松樹…',
+    body: `
+      <p>植物無法移動，卻演化出各種精妙的「種子交通工具」：</p>
+      <ul>
+        <li><strong>冠毛型</strong>：蒲公英種子頂著降落傘狀冠毛，隨風可飄移數公里。</li>
+        <li><strong>翅果型</strong>：楓樹、榆樹翅果旋轉飛翔，緩慢降落增加水平飄散距離。</li>
+        <li><strong>棉絮型</strong>：木棉、柳絮種子附著棉毛，重量極輕，乘氣流長距離旅行。</li>
+      </ul>
+      <div class="highlight-box">
+        📐 翅果的旋轉飛行是一種被動的「自旋穩定」飛行，工程師研究其氣動原理設計了微型無人機！
+      </div>
+    `
+  },
+  'm-thorn': {
+    title: '🌵 刺、毛——物理防禦盔甲',
+    sub: '防禦機制 | 玫瑰、仙人掌、蕁麻…',
+    body: `
+      <p>植物的物理防禦結構形式多樣：</p>
+      <ul>
+        <li><strong>棘刺（Thorn）</strong>：由莖的組織特化，如玫瑰皮刺，阻止大型草食動物。</li>
+        <li><strong>刺（Spine）</strong>：仙人掌的葉退化而成，同時減少蒸散面積。</li>
+        <li><strong>腺毛（Glandular hair）</strong>：分泌黏液捕蟲或揮發毒素驅蟲。</li>
+        <li><strong>蕁麻刺毛</strong>：注入組織胺、蟻酸等物質，產生強烈刺痛感。</li>
+      </ul>
+      <div class="highlight-box">
+        🌵 仙人掌的刺並非葉子的「加工品」，而是由葉全部退化而來，莖的綠色部分才進行光合作用。
+      </div>
+    `
+  },
+  'm-drought': {
+    title: '💧 儲水抗旱——沙漠生存術',
+    sub: '生存妙招 | 仙人掌、景天科植物',
+    body: `
+      <p>沙漠植物對乾旱的適應令人驚嘆：</p>
+      <ul>
+        <li><strong>莖儲水</strong>：仙人掌莖部有黏液狀多糖，能大量儲存雨水，重量可達 95% 為水分。</li>
+        <li><strong>CAM 代謝</strong>：夜晚開氣孔固定 CO₂，白天關閉氣孔，耗水量僅 C3 植物的 1/10。</li>
+        <li><strong>深廣根系</strong>：有些沙漠植物根系水平延伸超過 30 公尺攔截稀少降雨。</li>
+        <li><strong>葉的縮小或退化</strong>：減少蒸散面積，同時表面覆蠟質或毛茸隔熱。</li>
+      </ul>
+      <div class="highlight-box">
+        🌵 一株大型巨人柱（Saguaro）可在雨季儲存超過 750 公升的水，足夠它撐過數月旱季。
+      </div>
+    `
+  },
+  'm-symbiosis': {
+    title: '🍄 菌根共生——地下木聯網',
+    sub: '共生互利 | 90% 以上的陸生植物',
+    body: `
+      <p>植物與真菌之間存在最古老的共生聯盟之一：</p>
+      <ul>
+        <li><strong>外生菌根</strong>：菌絲包裹根尖外層，見於松、橡等樹木。</li>
+        <li><strong>叢枝菌根（AM）</strong>：菌絲深入根細胞內部，超過 80% 植物採用此形式。</li>
+        <li><strong>交換機制</strong>：植物提供高達 20% 的光合糖分，換取磷、鋅等礦物質及大幅增加的水分吸收面積。</li>
+        <li><strong>木聯網（Wood Wide Web）</strong>：菌根網路連接不同樹木，母樹可向幼苗輸送碳源，受傷植株的警訊也沿網傳遞。</li>
+      </ul>
+      <div class="highlight-box">
+        🌲 科學家估計，一茶匙森林土壤中含有超過 1 公里的菌絲，地下網路密度遠超過地上的樹冠。
+      </div>
+    `
+  },
+  'm-carnivore': {
+    title: '🪲 食蟲植物——氮的聰明獵手',
+    sub: '生存妙招 | 豬籠草、捕蠅草、茅膏菜',
+    body: `
+      <p>食蟲植物生長在氮磷極度匱乏的沼澤或酸性土壤，演化出多種捕食機制：</p>
+      <ul>
+        <li><strong>陷阱型</strong>：豬籠草（Nepenthes）的瓶狀葉裝有消化液，昆蟲滑落無法逃脫。</li>
+        <li><strong>夾式陷阱</strong>：捕蠅草（Venus Flytrap）感應到觸毛兩次觸碰後 0.1 秒內夾合。</li>
+        <li><strong>黏液陷阱</strong>：茅膏菜（Sundew）腺毛分泌黏稠露珠，昆蟲黏住後腺毛慢慢包裹。</li>
+        <li><strong>吸入式</strong>：狸藻（Utricularia）囊泡在 15 毫秒內產生負壓吸入小型水中生物。</li>
+      </ul>
+      <div class="highlight-box">
+        ⚡ 捕蠅草的夾合需要兩次刺激才觸發，是一種「計數」機制，避免因風吹或雨滴等假訊號白費力氣。
+      </div>
+    `
+  },
+  'm-shade': {
+    title: '🌿 趨光反應——搶奪陽光競賽',
+    sub: '生存妙招 | 所有植物',
+    body: `
+      <p>植物透過光敏素（Phytochrome）偵測光環境，做出精準反應：</p>
+      <ul>
+        <li><strong>向光性</strong>：生長素在背光側積累，使莖朝光源彎曲生長。</li>
+        <li><strong>遠紅光感知</strong>：遮蔭下紅光/遠紅光比率下降，植物加速莖的伸長、減少側枝，搶奪光線（避蔭症候群）。</li>
+        <li><strong>葉的重新排列</strong>：改變葉柄角度使葉片最大化受光，或在強光下將葉傾斜減少灼傷。</li>
+      </ul>
+      <div class="highlight-box">
+        🌱 在密林競爭中，植物「偵測」鄰居的方式甚至比感覺鄰居的遮蔭更早——只要遠紅光增加（鄰居反射），就開始拉高莖部準備競爭。
+      </div>
+    `
+  },
+  'm-freeze': {
+    title: '❄️ 耐凍策略——植物的防寒衣',
+    sub: '生存妙招 | 溫帶與高山植物',
+    body: `
+      <p>植物過冬有多種生理調適：</p>
+      <ul>
+        <li><strong>滲透調節</strong>：細胞積累可溶性糖、脯胺酸等，降低冰點，就像在細胞裡加入「防凍液」。</li>
+        <li><strong>抗凍蛋白（AFP）</strong>：與冰晶結合，阻止其成長與重結晶，保護細胞膜不被刺穿。</li>
+        <li><strong>落葉休眠</strong>：短日照誘發葉片凋落，回收葉中氮磷儲入莖幹，同時減少蒸散。</li>
+        <li><strong>芽苞（Bud）</strong>：生長點被多層鱗片與蠟質保護，維持最低生命活動至春暖。</li>
+      </ul>
+    `
+  },
+  'm-haustoria': {
+    title: '🌾 寄生植物——竊取者的技藝',
+    sub: '生存妙招 | 菟絲子、列當、桑寄生',
+    body: `
+      <p>寄生植物放棄光合作用，改「借」宿主為生：</p>
+      <ul>
+        <li><strong>全寄生</strong>：菟絲子無葉綠素，吸器（Haustoria）刺穿宿主韌皮部與木質部，同時竊取有機物與水分。</li>
+        <li><strong>半寄生</strong>：桑寄生仍有葉綠素可自行光合，但根部吸器連接宿主木質部取水和礦物質。</li>
+        <li><strong>地下寄生</strong>：列當、野菰根完全在土中，只在開花時露出地表，幾乎不可被察覺。</li>
+      </ul>
+      <div class="highlight-box">
+        🌾 菟絲子能「辨識」宿主種類——研究顯示它會優先選擇富含養分的宿主，甚至能跨越空氣空隙找到目標。
+      </div>
+    `
+  },
+  'm-wind-pollen': {
+    title: '🌬️ 風媒授粉——廣撒網策略',
+    sub: '繁殖策略 | 松、杉、禾本科、橡樹',
+    body: `
+      <p>風媒植物的花演化為高效的「花粉大炮」：</p>
+      <ul>
+        <li><strong>大量花粉</strong>：松樹每棵每季可產生數十億粒花粉，用數量彌補精準度的不足。</li>
+        <li><strong>輕巧花粉</strong>：多具氣囊或光滑表面，密度低利於飄浮。</li>
+        <li><strong>懸掛花序</strong>：柔荑花序（如楊樹、榛果）在風中顫動，花粉隨之散出。</li>
+        <li><strong>大型羽毛雌蕊</strong>：禾本科的雌蕊柱頭寬大如掃帚，最大化攔截飄散花粉。</li>
+      </ul>
+      <div class="highlight-box">
+        😷 過敏的代價——正因風媒花粉飄散廣泛，才造成大量人類對花粉過敏，估計全球有 10–30% 人口受影響。
+      </div>
+    `
+  },
+  'm-fruit-animal': {
+    title: '🍓 動物食果散播——甜蜜交易',
+    sub: '繁殖策略 | 漿果類、核果類植物',
+    body: `
+      <p>植物用果實「雇用」動物當快遞：</p>
+      <ul>
+        <li><strong>顏色訊號</strong>：成熟果實轉為紅、橙、紫色，在綠色葉片中醒目，專門吸引有色覺的鳥類。</li>
+        <li><strong>種子耐酸</strong>：硬質種皮耐胃酸腐蝕，通過消化道後仍保持活力，甚至發芽率更高。</li>
+        <li><strong>鉤刺黏附</strong>：蒼耳、鬼針草種子具鉤刺，鉤住動物毛皮順路旅行到新地點。</li>
+        <li><strong>螞蟻散播（Myrmecochory）</strong>：種子附有富含脂肪的油質體（Elaiosome）吸引螞蟻搬回巢，植物因而被帶入隱蔽有機質豐富的新土壤。</li>
+      </ul>
+    `
+  },
+  'm-clone': {
+    title: '🌱 無性繁殖——快速佔地',
+    sub: '繁殖策略 | 草莓、薑、薄荷、馬鈴薯',
+    body: `
+      <p>無性繁殖讓植物在同一地點快速建立族群：</p>
+      <ul>
+        <li><strong>走莖</strong>：草莓沿地面延伸走莖，每個節點生根長葉，短時間內形成密集族群。</li>
+        <li><strong>地下莖</strong>：薑、蓮藕的橫走地下莖每節可萌發新芽，即使地上部被破壞仍能再生。</li>
+        <li><strong>塊莖</strong>：馬鈴薯累積大量澱粉作為休眠期能量，芽眼即為無性繁殖起點。</li>
+        <li><strong>不定根與出芽</strong>：落地生根（Kalanchoe）葉緣直接長出完整小植株，落地即可獨立生長。</li>
+      </ul>
+      <div class="highlight-box">
+        🌳 美國猶他州的顫楊林「潘多（Pando）」——估計 47,000 棵樹實為同一株植物的無性系，共重約 600 萬公斤，是地球最重的生物！
+      </div>
+    `
+  },
+  'm-explosive': {
+    title: '💥 彈射散播——植物的彈弓',
+    sub: '繁殖策略 | 鳳仙花、噴瓜、大戟科',
+    body: `
+      <p>植物利用儲存的機械張力彈射種子：</p>
+      <ul>
+        <li><strong>鳳仙花</strong>：果皮乾燥後張力驟增，輕觸即爆開，將種子彈出 1–2 公尺。</li>
+        <li><strong>噴瓜（Squirting Cucumber）</strong>：果實內液壓極高，成熟後從莖脫落的瞬間將種子漿液噴出達 10 公尺。</li>
+        <li><strong>大戟科</strong>：蒴果乾裂時各室猛烈分離，彈出種子，聲音清脆可聞。</li>
+        <li><strong>酢漿草</strong>：種皮內外層乾燥速率差異，瞬間翻轉將種子彈出。</li>
+      </ul>
+    `
+  },
+  'm-toxin': {
+    title: '☠️ 生物鹼與毒素——化學武器庫',
+    sub: '防禦機制 | 罌粟、菸草、咖啡、毛地黃',
+    body: `
+      <p>植物合成的次生代謝物構成龐大的化學防禦庫：</p>
+      <ul>
+        <li><strong>生物鹼</strong>：咖啡因抑制草食性昆蟲的神經；嗎啡讓哺乳類出現痛覺抑制與成癮；菸鹼素（尼古丁）攻擊昆蟲的神經接受器。</li>
+        <li><strong>單寧酸（Tannin）</strong>：與蛋白質結合降低食物消化率，草食動物吃多後感覺飽但營養吸收差。</li>
+        <li><strong>強心苷</strong>：毛地黃的洋地黃苷干擾心臟 Na⁺/K⁺ 泵，對小型草食動物極毒。</li>
+      </ul>
+      <div class="highlight-box">
+        💊 許多人類藥物源自植物毒素！阿斯匹靈（柳樹皮）、嗎啡（罌粟）、奎寧（金雞納樹）、紫杉醇（抗癌，紫杉樹）。
+      </div>
+    `
+  },
+  'm-volatile': {
+    title: '📡 揮發性化學訊號——植物的對講機',
+    sub: '防禦機制 | 玉米、菸草、利馬豆…',
+    body: `
+      <p>受到昆蟲攻擊的植物能「廣播」求救信號：</p>
+      <ul>
+        <li><strong>茉莉酮酸（JA）</strong>：受傷細胞合成並轉化為揮發性甲基茉莉酮酸（MeJA），飄散至鄰近植株觸發防禦基因表達。</li>
+        <li><strong>召喚天敵</strong>：利馬豆受蟎蟲攻擊時，釋放特定氣味混合物吸引蟎蟲的天敵捕食性蟎到來。</li>
+        <li><strong>玉米的化學廣播</strong>：夜蛾幼蟲啃食後，玉米釋放揮發物吸引蠅類寄生蜂，寄生蜂寄生幼蟲後有效降低蟲害。</li>
+      </ul>
+      <div class="highlight-box">
+        🌿 割草的清香（草的氣味）是植物的「求救訊號」——己醛（hexanal）等揮發物既是警告鄰近植物，也可能是吸引草食者天敵。
+      </div>
+    `
+  },
+  'm-mimic': {
+    title: '🦋 偽裝與擬態——視覺欺騙術',
+    sub: '防禦機制 | 西番蓮、石頭玉、鏡蘭',
+    body: `
+      <p>植物的視覺欺騙策略精妙程度令人稱奇：</p>
+      <ul>
+        <li><strong>偽蟲卵斑（Egg mimicry）</strong>：西番蓮葉片演化出黃色斑點，模仿帶斑蝶蟲卵，使雌蝶誤以為已有競爭者而不產卵，大幅減少植食壓力。</li>
+        <li><strong>石頭偽裝</strong>：南非的石頭玉（Lithops）葉片形態、色澤如同礫石，連草食動物也難以發現。</li>
+        <li><strong>昆蟲擬態蘭</strong>：蜂蘭（Ophrys）花瓣色澤、絨毛與形狀高度模擬雌蜂，誘騙雄蜂「交配」以完成授粉，不需提供任何報酬。</li>
+      </ul>
+    `
+  },
+  'm-ant': {
+    title: '🐜 僱用螞蟻當保鑣',
+    sub: '防禦機制 | 牛角金合歡、蟻栖植物',
+    body: `
+      <p>某些植物演化出為螞蟻提供食宿的結構，換取全天候保護：</p>
+      <ul>
+        <li><strong>牛角金合歡</strong>：刺內中空供蟻后定居；葉柄基部分泌蜜液；葉尖小體（Beltian bodies）富含蛋白脂肪。螞蟻則 24 小時驅逐所有訪客，甚至咬斷周圍纏繞的藤蔓。</li>
+        <li><strong>蟻栖植物（Myrmecodia）</strong>：莖部形成天然迷宮空腔，螞蟻廢棄物在腔壁被吸收做為氮磷養分。</li>
+        <li><strong>花外蜜腺</strong>：葉片或莖部提供蜜液，招募多種螞蟻在植物表面巡邏。</li>
+      </ul>
+      <div class="highlight-box">
+        🐜 移除牛角金合歡上的螞蟻後，植物在數週內遭草食動物嚴重破壞並被藤蔓纏繞，螞蟻的保護效果立竿見影。
+      </div>
+    `
+  },
+  'm-hypersensitive': {
+    title: '⚡ 過敏反應（HR）——壯士斷腕',
+    sub: '防禦機制 | 所有植物',
+    body: `
+      <p>植物面對病原菌入侵時採用「壯士斷腕」的免疫策略：</p>
+      <ul>
+        <li><strong>識別病原</strong>：細胞膜上的 PRR 受體辨識病原相關分子模式（PAMP），啟動基礎免疫（PTI）。</li>
+        <li><strong>過敏反應（HR）</strong>：感染細胞主動凋亡，形成焦枯壞死區，阻止病菌擴散到健康組織。</li>
+        <li><strong>全身獲得性抵抗（SAR）</strong>：感染部位產生水楊酸（Salicylic acid）訊號，傳導至全株誘導防禦基因表達，使未感染部位提前備戰。</li>
+        <li><strong>ROS 爆發</strong>：快速產生活性氧（H₂O₂ 等）直接殺菌，並強化細胞壁。</li>
+      </ul>
+    `
+  }
+};
+
+function openModal(id) {
+  const d = modals[id];
+  if (!d) return;
+  document.getElementById('modal-title').textContent = d.title;
+  document.getElementById('modal-subtitle').textContent = d.sub;
+  document.getElementById('modal-body').innerHTML = d.body;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModalOnBg(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+// ── QUIZ ──
+const allQuestions = [
+  {
+    q: '植物利用哪種色素吸收太陽光能，進行光合作用？',
+    opts: ['花青素', '葉綠素', '類胡蘿蔔素', '葉黃素'],
+    ans: 1,
+    exp: '葉綠素（chlorophyll）是光合作用的主要色素，存在於葉綠體中，吸收紅光與藍光最有效。'
+  },
+  {
+    q: 'CAM（景天酸代謝）植物在哪個時段才開放氣孔固定 CO₂？',
+    opts: ['正午陽光最強時', '傍晚日落時', '夜晚', '清晨五點'],
+    ans: 2,
+    exp: 'CAM 植物夜晚開氣孔固定 CO₂ 儲存為蘋果酸，白天關閉氣孔進行光合，大幅降低水分散失。'
+  },
+  {
+    q: '捕蠅草需要觸毛被觸碰幾次才會夾合？',
+    opts: ['一次', '兩次', '三次', '五次'],
+    ans: 1,
+    exp: '捕蠅草需要兩次刺激才夾合，這是避免風吹或雨滴等假訊號浪費能量的「計數」機制。'
+  },
+  {
+    q: '下列哪種散播方式是蒲公英種子使用的？',
+    opts: ['水力散播', '動物食果', '風力（冠毛）', '彈射散播'],
+    ans: 2,
+    exp: '蒲公英種子頂著冠毛（降落傘），能隨風飄移數公里，屬於典型的風力散播。'
+  },
+  {
+    q: '牛角金合歡為螞蟻提供食宿，螞蟻回報的是？',
+    opts: ['提供水分', '驅逐草食動物與藤蔓', '幫助授粉', '分解枯葉提供養分'],
+    ans: 1,
+    exp: '牛角金合歡的螞蟻保鑣會攻擊所有靠近的草食動物，並咬斷試圖纏繞的藤蔓植物，24小時守護。'
+  },
+  {
+    q: '菌根共生中，植物主要獲得的好處是？',
+    opts: ['氮氣固定', '磷與礦物質及更多水分', '抵抗病毒', '提高花粉活力'],
+    ans: 1,
+    exp: '菌根菌的菌絲大幅擴展根的吸收面積，幫助植物吸收磷等礦物質與水分；植物則回報光合糖分。'
+  },
+  {
+    q: '西番蓮葉片的黃色斑點是為了模仿什麼？',
+    opts: ['蜜腺', '帶斑蝶的蟲卵', '花朵', '腺毛'],
+    ans: 1,
+    exp: '西番蓮葉片演化出模擬帶斑蝶蟲卵的斑點，讓雌蝶誤認此葉已被佔用而不產卵，減少幼蟲破壞。'
+  },
+  {
+    q: '植物受病原菌感染後，哪種機制會讓感染細胞主動「自殺」以阻止擴散？',
+    opts: ['光合抑制', '過敏反應（HR）', '化感作用', '向光反應'],
+    ans: 1,
+    exp: '過敏反應（Hypersensitive Response）讓感染細胞迅速凋亡，形成壞死壁壘圍困病菌，防止蔓延。'
+  },
+  {
+    q: '噴瓜（Squirting Cucumber）散播種子的最遠距離約為？',
+    opts: ['0.5 公尺', '2 公尺', '10 公尺', '50 公尺'],
+    ans: 2,
+    exp: '噴瓜成熟後脫落瞬間，內部液壓猛烈釋放，可將種子與漿液噴出達10公尺遠。'
+  },
+  {
+    q: '植物受遮蔭時，遠紅光比例上升，這會導致植物？',
+    opts: ['縮短莖部節間', '加速莖伸長向上競爭光源', '增加分枝', '閉合氣孔'],
+    ans: 1,
+    exp: '遮蔭使紅光/遠紅光比率下降，植物藉光敏素偵測到此訊號後，加速莖的伸長（避蔭症候群）以突破競爭。'
+  }
+];
+
+let quizState = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function initQuiz() {
+  const questions = shuffle(allQuestions).slice(0, 6);
+  quizState = questions.map(() => ({ answered: false, correct: false }));
+  const container = document.getElementById('quiz-container');
+  const scoreEl = document.getElementById('quiz-score');
+  const restartBtn = document.getElementById('quiz-restart');
+  scoreEl.style.display = 'none';
+  restartBtn.style.display = 'none';
+
+  container.innerHTML = questions.map((q, qi) => `
+    <div class="quiz-question" id="qq-${qi}">
+      <div class="q-num">第 ${qi + 1} 題 / 共 ${questions.length} 題</div>
+      <div class="q-text">${q.q}</div>
+      <div class="quiz-options">
+        ${q.opts.map((o, oi) => `
+          <button class="quiz-opt" id="opt-${qi}-${oi}" onclick="answerQuiz(${qi},${oi},${q.ans},this)">
+            ${String.fromCharCode(65 + oi)}．${o}
+          </button>`).join('')}
+      </div>
+      <div class="quiz-explain" id="exp-${qi}">💡 ${q.exp}</div>
+    </div>
+  `).join('');
+
+  window._quizQuestions = questions;
+}
+
+function answerQuiz(qi, chosen, correct, btn) {
+  if (quizState[qi].answered) return;
+  quizState[qi].answered = true;
+  quizState[qi].correct = (chosen === correct);
+
+  const opts = document.querySelectorAll(`[id^="opt-${qi}-"]`);
+  opts.forEach((o, i) => {
+    o.classList.add('disabled');
+    if (i === correct) o.classList.add('correct');
+    else if (i === chosen && chosen !== correct) o.classList.add('wrong');
+  });
+  document.getElementById(`exp-${qi}`).classList.add('show');
+
+  if (quizState.every(s => s.answered)) {
+    const score = quizState.filter(s => s.correct).length;
+    const total = quizState.length;
+    const pct = Math.round(score / total * 100);
+    const emoji = pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚';
+    const scoreEl = document.getElementById('quiz-score');
+    scoreEl.innerHTML = `${emoji} 你答對了 ${score} / ${total} 題（${pct}%）<br><span style="font-size:0.9rem;color:#6b8f71;">${pct>=80?'太棒了，植物妙招達人！':pct>=60?'不錯喔，再複習一下吧！':'繼續學習，你會越來越強的！'}</span>`;
+    scoreEl.style.display = 'block';
+    document.getElementById('quiz-restart').style.display = 'block';
+  }
+}
+
+// init
+initQuiz();
+</script>
+</body>
+</html>
